@@ -3,7 +3,7 @@
 #include "Test.h"
 
 namespace test {
-	class TestClearColor : public test
+	class TestClearColor : public Test
 	{
 	public:
 		TestClearColor();
