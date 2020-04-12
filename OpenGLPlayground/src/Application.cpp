@@ -22,7 +22,9 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
+#include "tests/Test.h"
 #include "tests/TestClearColor.h"
+#include "tests/TestTexture2D.h"
 
 int main(void)
 {
@@ -51,9 +53,7 @@ int main(void)
 
 	/* Initialize glew */
 	if (glewInit() != GLEW_OK)
-	{
 		std::cout << "GLEW ERROR! Glew is not ok..." << std::endl;
-	}
 
 	/* Log openGL version */
 	std::cout << glGetString(GL_VERSION) << std::endl;
@@ -76,20 +76,38 @@ int main(void)
 		ImGui_ImplGlfw_InitForOpenGL(window, true);
 		ImGui_ImplOpenGL3_Init((char*)glGetString(GL_NUM_SHADING_LANGUAGE_VERSIONS));
 
-		test::TestClearColor test;
-		
+		test::Test* currentTest = nullptr;
+		test::TestMenu* testMenu = new test::TestMenu(currentTest);
+		currentTest = testMenu;
+
+		testMenu->RegisterTest<test::TestClearColor>("Clear Color");
+		testMenu->RegisterTest<test::TestTexture2D>("2D Texture");
+
 		while (!glfwWindowShouldClose(window))									/// Loop until the user closes the window
 		{
+			GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
 			renderer.Clear();													// Clear screen
-
-			test.OnUpdate(0.0f);
-			test.OnRender();
 
 			ImGui_ImplOpenGL3_NewFrame();										// ImGui new frame
 			ImGui_ImplGlfw_NewFrame();											// X
 			ImGui::NewFrame();													// X
 
-			test.OnImGuiRender();
+			if (currentTest)
+			{
+				currentTest->OnUpdate(0.0f);
+				currentTest->OnRender();
+				ImGui::Begin("Title");
+				if (currentTest != testMenu)
+				{
+					if (ImGui::Button("<-"))
+					{
+						delete currentTest;
+						currentTest = testMenu;
+					}
+				}
+				currentTest->OnImGuiRender();
+				ImGui::End();
+			}
 
 			ImGui::Render();													// ImGUI draw
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());				// X
@@ -97,7 +115,13 @@ int main(void)
 			glfwSwapBuffers(window);											// Swap front and back buffers
 			glfwPollEvents();													// Poll for and process events
 		}
+		// Test cleanup
+		delete currentTest;
+		if (currentTest != testMenu)
+			delete testMenu;
 	}
+	
+	
 
 	// ImGui cleanup
 	ImGui_ImplOpenGL3_Shutdown();
