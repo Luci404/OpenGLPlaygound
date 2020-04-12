@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{B71CDCC9-4592-4D5C-A9D0-9D68E9592B86}</ProjectGuid>
-    <RootNamespace>OpenGLPlaygound</RootNamespace>
+    <RootNamespace>OpenGLPlayground</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
