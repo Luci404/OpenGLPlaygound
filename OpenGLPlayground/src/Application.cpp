@@ -60,7 +60,7 @@ int main(void)
 
 		IMGUI_CHECKVERSION();													
 		ImGui::CreateContext();															// Create ImGui context
-		ImGuiIO& io = ImGui::GetIO(); (void)io
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
 		ImGui::StyleColorsDark();														// Set ImGui color theme
 
 		ImGui_ImplGlfw_InitForOpenGL(window, true);										// Init ImGui for OpenGL
