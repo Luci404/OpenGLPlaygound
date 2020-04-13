@@ -28,109 +28,94 @@
 
 int main(void)
 {
-	GLFWwindow* window;
+	GLFWwindow* window;																	// Create a window ptr
+		
+	if (!glfwInit())																	// Initialize GLFW														
+		return -1;																		// If initialization failed, end application
 
-	/* Initialize the library */
-	if (!glfwInit())
-		return -1;
-
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-
-	/* Create a windowed mode window and its OpenGL context */
-	window = glfwCreateWindow(960, 540, "Hello World", NULL, NULL);
-	if (!window)
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);										// Set the major version of OpenGL to 3
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);										// Set the minor version of OpenGL to 3
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);						// Use OpenGL Core
+			
+	window = glfwCreateWindow(960, 540, "Hello World", NULL, NULL);						// Create window.
+	if (!window)																		// If the window did not get created propperly
 	{
-		glfwTerminate();
-		return -1;
+		glfwTerminate();																// Terminate GLFW
+		return -1;																		// End application
 	}
 
-	/* Make the window's context current */
-	glfwMakeContextCurrent(window);
-	glfwSwapInterval(1);
+	glfwMakeContextCurrent(window);														// Set window.
+	glfwSwapInterval(1);																// Set swap interval
 
-	/* Initialize glew */
-	if (glewInit() != GLEW_OK)
-		std::cout << "GLEW ERROR! Glew is not ok..." << std::endl;
+	if (glewInit() != GLEW_OK)															// Initialize glew 
+		std::cout << "GLEW ERROR! Glew is not ok..." << std::endl;						// If not initialize correctly: log error.
 
-	/* Log openGL version */
-	std::cout << glGetString(GL_VERSION) << std::endl;
+	std::cout << glGetString(GL_VERSION) << std::endl;									// Log openGL version 
 
-	/* Generate vertex buffer */
 	{
-		GLCall(glEnable(GL_BLEND));
-		GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+		GLCall(glEnable(GL_BLEND));														// Enable blending	
+		GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));						// Set blending function
 
-		// Create renderer
-		Renderer renderer;
+		Renderer renderer;																// Create a new renderer
 
-		// Setup Dear ImGui context
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
-		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		ImGui::StyleColorsDark();
+		IMGUI_CHECKVERSION();													
+		ImGui::CreateContext();															// Create ImGui context
+		ImGuiIO& io = ImGui::GetIO(); (void)io
+		ImGui::StyleColorsDark();														// Set ImGui color theme
 
-		// Setup Platform/Renderer bindings
-		ImGui_ImplGlfw_InitForOpenGL(window, true);
+		ImGui_ImplGlfw_InitForOpenGL(window, true);										// Init ImGui for OpenGL
 		ImGui_ImplOpenGL3_Init((char*)glGetString(GL_NUM_SHADING_LANGUAGE_VERSIONS));
 
-		test::Test* currentTest = nullptr;
-		test::TestMenu* testMenu = new test::TestMenu(currentTest);
-		currentTest = testMenu;
+		test::Test* currentTest = nullptr;												// Create a pointer to the currentTest
+		test::TestMenu* testMenu = new test::TestMenu(currentTest);						// Create a pointer to the testMenu
+		currentTest = testMenu;															// Set the currentTest to be the testMenu
 
-		testMenu->RegisterTest<test::TestClearColor>("Clear Color");
-		testMenu->RegisterTest<test::TestTexture2D>("2D Texture");
+		testMenu->RegisterTest<test::TestClearColor>("Clear Color");					// Register 'TestClearColor' to the testMenu
+		testMenu->RegisterTest<test::TestTexture2D>("2D Texture");						// Register 'TestTexture2D' to the testMenu
 
-		while (!glfwWindowShouldClose(window))									/// Loop until the user closes the window
+		while (!glfwWindowShouldClose(window))											// Loop until the user closes the window
 		{
-			GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
-			renderer.Clear();													// Clear screen
+			GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));								// Set the clear color
+			renderer.Clear();															// Clear screen
 
-			ImGui_ImplOpenGL3_NewFrame();										// ImGui new frame
-			ImGui_ImplGlfw_NewFrame();											// X
-			ImGui::NewFrame();													// X
+			ImGui_ImplOpenGL3_NewFrame();												// ImGui new frame
+			ImGui_ImplGlfw_NewFrame();													// ImGui new frame
+			ImGui::NewFrame();															// ImGui new frame
 
-			if (currentTest)
+			if (currentTest)															// If there is a currentTest, call it's functions
 			{
-				currentTest->OnUpdate(0.0f);
-				currentTest->OnRender();
-				ImGui::Begin("Title");
-				if (currentTest != testMenu)
+				currentTest->OnUpdate(0.0f);											// Call the currentTest's OnUpdate function
+				currentTest->OnRender();												// Call the currentTest's OnRender function
+				ImGui::Begin("Title");													// Start new ImGui window
+				if (currentTest != testMenu)											// If the currentTest is not the test menu
 				{
-					if (ImGui::Button("<-"))
-					{
-						delete currentTest;
-						currentTest = testMenu;
+					if (ImGui::Button("<-"))											// Create a back button
+					{																	
+						delete currentTest;												// Delete the currentTest
+						currentTest = testMenu;											// Set the currentTest to be the testMenu
 					}
 				}
-				currentTest->OnImGuiRender();
-				ImGui::End();
+				currentTest->OnImGuiRender();											// Call the currentTest's OnImGuiRender function
+				ImGui::End();															// End (unbind) ImGui window
 			}
 
-			ImGui::Render();													// ImGUI draw
-			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());				// X
+			ImGui::Render();															// ImGUI draw
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());						// ImGUI draw
 			
-			glfwSwapBuffers(window);											// Swap front and back buffers
-			glfwPollEvents();													// Poll for and process events
+			glfwSwapBuffers(window);													// Swap front and back buffers
+			glfwPollEvents();															// Poll for and process events
 		}
-		// Test cleanup
-		delete currentTest;
-		if (currentTest != testMenu)
-			delete testMenu;
+		delete currentTest;																// Delete the current test
+		if (currentTest != testMenu)													// Delete the testMenu, if currentTest is something else
+			delete testMenu;															// Delete the testMenu
 	}
 	
-	
+	ImGui_ImplOpenGL3_Shutdown();														// ImGui cleanup OpenGL bindings
+	ImGui_ImplGlfw_Shutdown();															// ImGui cleanup GLFW bindings
+	ImGui::DestroyContext();															// ImGui cleanup the context
 
-	// ImGui cleanup
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
+	glfwDestroyWindow(window);															// GLFW cleanup window
+	glfwTerminate();																	// Terminate the GLFW context
 
-	// OpenGL/GLFW cleanup
-	glfwDestroyWindow(window);
-	glfwTerminate();
-
-	return 0;
+	return 0;																			// End the application
 }

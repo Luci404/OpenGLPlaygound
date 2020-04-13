@@ -59,8 +59,8 @@ namespace test {
 
 	void TestTexture2D::OnRender()
 	{
-		GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
-		GLCall(glClear());
+		//GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
+		//GLCall(glClear());
 
 		Renderer renderer;
 
